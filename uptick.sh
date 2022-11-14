@@ -71,11 +71,11 @@ source ~/.bash_profile
 fi
 
 # download binary
-cd $HOME
-wget -qO v0.2.4.tar.gz https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz --no-check-certificate
-tar -zxvf v0.2.4.tar.gz
-sudo chmod +x uptick-linux-amd64-v0.2.4/uptickd
-sudo mv uptick-linux-amd64-v0.2.4/uptickd $(which uptickd)
+wget https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz
+tar -zxvf uptick-linux-amd64-v0.2.4.tar.gz
+chmod +x $HOME/uptick-linux-amd64-v0.2.4/uptickd
+mv $HOME/uptick-linux-amd64-v0.2.4/uptickd $HOME/go/bin/
+rm uptick-linux-amd64-v0.2.4.tar.gz
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
