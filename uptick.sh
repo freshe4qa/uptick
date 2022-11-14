@@ -116,12 +116,6 @@ sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${U
 # enable prometheus
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
 
-# reset
-wget https://download.uptick.network/download/uptick/testnet/node/data/data.tar.gz
-tar -C $HOME/.uptickd/data/ -zxvf data.tar.gz --strip-components 1
-sed -i -e "s/^pruning *=.*/pruning = \"nothing\"/" $HOME/.uptickd/config/app.toml
-sudo systemctl restart uptickd && sudo journalctl -u uptickd -f -o cat
-
 # create service
 sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
 [Unit]
