@@ -72,10 +72,9 @@ fi
 
 # download binary
 cd $HOME
-wget https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz
-tar -zxvf uptick-linux-amd64-v0.2.4.tar.gz
-chmod +x $HOME/uptick-linux-amd64-v0.2.4/uptickd
-mv $HOME/uptick-linux-amd64-v0.2.4/uptickd $HOME/go/bin/
+git clone https://github.com/UptickNetwork/uptick && cd uptick
+git checkout v0.2.4
+make install
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
