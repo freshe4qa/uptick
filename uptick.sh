@@ -71,11 +71,11 @@ source ~/.bash_profile
 fi
 
 # download binary
+cd $HOME
 wget https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz
 tar -zxvf uptick-linux-amd64-v0.2.4.tar.gz
 chmod +x $HOME/uptick-linux-amd64-v0.2.4/uptickd
 mv $HOME/uptick-linux-amd64-v0.2.4/uptickd $HOME/go/bin/
-rm uptick-linux-amd64-v0.2.4.tar.gz
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
@@ -86,10 +86,7 @@ uptickd config node tcp://localhost:${UPTICK_PORT}657
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
-curl -o $HOME/.uptickd/config/genesis.json https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json
-curl -o $HOME/.uptickd/config/addrbook.json https://raw.githubusercontent.com/kj89/testnet_manuals/main/uptick/addrbook.json
-curl -o $HOME/.uptickd/config/config.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/config.toml
-curl -o $HOME/.uptickd/config/app.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/app.toml
+wget -O $HOME/.uptickd/config/genesis.json "https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json"
 
 # set minimum gas price
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
@@ -121,11 +118,10 @@ sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${U
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
 
 # reset
-cd  $HOME/.uptickd
-rm -rf data
-wget -O data.tar.gz https://download.uptick.network/download/uptick/testnet/node/data/data.tar.gz --no-check-certificate
-tar -zxvf data.tar.gz
-rm -rf data.tar.gz
+wget https://download.uptick.network/download/uptick/testnet/node/data/data.tar.gz
+tar -C $HOME/.uptickd/data/ -zxvf data.tar.gz --strip-components 1
+sed -i -e "s/^pruning *=.*/pruning = \"nothing\"/" $HOME/.uptickd/config/app.toml
+sudo systemctl restart uptickd && sudo journalctl -u uptickd -f -o cat
 
 # create service
 sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
