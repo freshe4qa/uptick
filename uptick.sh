@@ -85,10 +85,7 @@ uptickd config node tcp://localhost:${UPTICK_PORT}657
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
-curl -o $HOME/.uptickd/config/genesis.json https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json
-curl -o $HOME/.uptickd/config/addrbook.json https://raw.githubusercontent.com/kj89/testnet_manuals/main/uptick/addrbook.json
-curl -o $HOME/.uptickd/config/config.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/config.toml
-curl -o $HOME/.uptickd/config/app.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/app.toml
+wget -O $HOME/.uptickd/config/genesis.json "https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json"
 
 # set minimum gas price
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
@@ -124,12 +121,14 @@ sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
 [Unit]
 Description=uptick
 After=network-online.target
+
 [Service]
 User=$USER
-ExecStart=$(which uptickd) start --home $HOME/.uptickd
+ExecStart=$(which uptickd) start
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
+
 [Install]
 WantedBy=multi-user.target
 EOF
