@@ -85,7 +85,10 @@ uptickd config node tcp://localhost:${UPTICK_PORT}657
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
-wget -O $HOME/.uptickd/config/genesis.json "https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json"
+curl -o $HOME/.uptickd/config/genesis.json https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json
+curl -o $HOME/.uptickd/config/addrbook.json https://raw.githubusercontent.com/kj89/testnet_manuals/main/uptick/addrbook.json
+curl -o $HOME/.uptickd/config/config.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/config.toml
+curl -o $HOME/.uptickd/config/app.toml https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/app.toml
 
 # set minimum gas price
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
