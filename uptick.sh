@@ -71,10 +71,11 @@ source ~/.bash_profile
 fi
 
 # download binary
-cd $HOME
-git clone https://github.com/UptickNetwork/uptick && cd uptick
-git checkout v0.2.4
-make install
+curl -L -k https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz > uptick.tar.gz
+tar -xvzf uptick.tar.gz
+sudo mv -f uptick-linux-amd64-v0.2.4/uptickd /usr/local/bin/uptickd
+rm -rf uptick.tar.gz
+rm -rf uptick-v0.2.4
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
@@ -85,7 +86,7 @@ uptickd config node tcp://localhost:${UPTICK_PORT}657
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
-wget -O $HOME/.uptickd/config/genesis.json "https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json"
+curl https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/genesis.json > $HOME/.uptickd/config/genesis.json
 
 # set minimum gas price
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
@@ -117,21 +118,28 @@ sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${U
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
 
 # create service
-sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
+sudo tee /etc/systemd/system/uptickd.service > /dev/null << EOF
 [Unit]
-Description=uptick
+Description=Uptick Network Node
 After=network-online.target
-
 [Service]
 User=$USER
 ExecStart=$(which uptickd) start
 Restart=on-failure
-RestartSec=3
-LimitNOFILE=65535
-
+RestartSec=10
+LimitNOFILE=10000
 [Install]
 WantedBy=multi-user.target
 EOF
+
+uptickd tendermint unsafe-reset-all --home $HOME/.uptickd/ --keep-addr-book
+
+cd "$HOME/.uptickd" || return
+rm -rf data
+rm -rf wasm
+
+SNAP_NAME=$(curl -s https://snapshots1-testnet.nodejumper.io/uptick-testnet/ | egrep -o ">uptick_7000-1.*\.tar.lz4" | tr -d ">")
+curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/${SNAP_NAME} | lz4 -dc - | tar -xf - -C $HOME/.uptickd
 
 # start service
 sudo systemctl daemon-reload
