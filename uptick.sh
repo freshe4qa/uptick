@@ -93,7 +93,7 @@ sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/
 
 # set peers and seeds
 SEEDS=$(curl -sL https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/seeds.txt | tr '\n' ',')
-PEERS=$(curl -sL https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-1/peers.txt | tr '\n' ',')
+PEERS="fb6dba36fcf9f62a817558c0bd10e114ac8c44cc@116.203.183.189:15656,e91a765eda6a596afedc6a8407b879156177d079@161.97.99.224:26656,4f5028d78ee4f57a2ed73c57e4b2ad1f9bf9c852@75.119.151.202:30656,2763c95b0c9b0b31c312b06d6ae6887968fb9830@194.163.154.224:26656,453aff3405698476967251ee253a03bedf4f0dce@178.211.139.124:15656,5bd564b7be4fd6ec3a6bf2102dbdc09a2ce7a807@95.214.54.35:26656,9b73a0139be9c95d9a9899c7928b4db88c19e14a@209.145.62.101:15656,bf626ac1b0c733c0937d70d8c834c94c3e4b9033@65.108.129.29:14656,8c39a28b2a77ddf3dc920325b87b927eac0dac89@144.76.27.79:60656,a3db540dd85f8479d50a88e6b6aef0d6b3d39b11@135.181.35.153:26656,ecf4c3dfaa23503b62c45646a5e7229be815eba4@157.90.95.230:26656,12fe5ed38770b4bb59c59e183ec1161aebda2a4e@185.173.38.18:26656,38274db3c972fc2628eefa528930e6fb5423211f@154.53.51.219:26646,20aaf646f9c766a8b81d838554ba6e593122ed1f@46.4.122.236:36656,a9bb3d5c36cf62a280c13f3e37c93a4b17707eab@142.132.196.251:46656,12be06902509991a41c7ba809e5297e4e609453d@93.183.211.203:26656"
 sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.uptickd/config/config.toml
 
 # disable indexing
