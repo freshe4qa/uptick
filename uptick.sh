@@ -52,7 +52,6 @@ echo "export UPTICK_CHAIN_ID=uptick_7000-2" >> $HOME/.bash_profile
 echo "export UPTICK_PORT=${UPTICK_PORT}" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
-
 # update
 sudo apt update && sudo apt upgrade -y
 
@@ -73,11 +72,11 @@ source ~/.bash_profile
 fi
 
 # download binary
-cd $HOME
-git clone https://github.com/UptickNetwork/uptick.git
-cd uptick
-git checkout v0.2.4
-make install
+curl -L -k https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz > uptick.tar.gz
+tar -xvzf uptick.tar.gz
+sudo mv -f uptick-linux-amd64-v0.2.4/uptickd /usr/local/bin/uptickd
+rm -rf uptick.tar.gz
+rm -rf uptick-v0.2.4
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
@@ -118,13 +117,6 @@ sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${U
 
 # enable prometheus
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
-
-# restore data
-cd  $HOME/.uptickd
-rm -rf data
-wget -O data.tar.gz https://download.uptick.network/download/uptick/testnet/node/data/data.tar.gz --no-check-certificate
-tar -zxvf data.tar.gz
-rm -rf data.tar.gz
 
 # create service
 sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
