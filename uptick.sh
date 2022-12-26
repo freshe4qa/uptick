@@ -118,6 +118,8 @@ sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${U
 # enable prometheus
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
 
+uptickd tendermint unsafe-reset-all --home $HOME/.uptickd
+
 # create service
 sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
 [Unit]
@@ -134,7 +136,6 @@ WantedBy=multi-user.target
 EOF
 
 cp $HOME/.uptickd/data/priv_validator_state.json $HOME/.uptickd/priv_validator_state.json.backup
-uptickd tendermint unsafe-reset-all --home $HOME/.uptickd --keep-addr-book
 
 SNAP_NAME=$(curl -s https://snapshots1-testnet.nodejumper.io/uptick-testnet/ | egrep -o ">uptick_7000-2.*\.tar.lz4" | tr -d ">")
 curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/${SNAP_NAME} | lz4 -dc - | tar -xf - -C $HOME/.uptickd
