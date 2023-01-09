@@ -44,12 +44,10 @@ if [ ! $NODENAME ]; then
 	read -p "Enter node name: " NODENAME
 	echo 'export NODENAME='$NODENAME >> $HOME/.bash_profile
 fi
-UPTICK_PORT=15
 if [ ! $WALLET ]; then
 	echo "export WALLET=wallet" >> $HOME/.bash_profile
 fi
 echo "export UPTICK_CHAIN_ID=uptick_7000-2" >> $HOME/.bash_profile
-echo "export UPTICK_PORT=${UPTICK_PORT}" >> $HOME/.bash_profile
 source $HOME/.bash_profile
 
 # update
@@ -81,13 +79,13 @@ rm -rf uptick-v0.2.4
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
 uptickd config keyring-backend test
-uptickd config node tcp://localhost:${UPTICK_PORT}657
 
 # init
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
 curl -o $HOME/.uptickd/config/genesis.json https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-2/genesis.json
+curl -s https://snapshots1-testnet.nodejumper.io/uptick-testnet/addrbook.json > $HOME/.uptickd/config/addrbook.json
 
 # set minimum gas price
 sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
@@ -111,31 +109,25 @@ sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_rec
 sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"$pruning_keep_every\"/" $HOME/.uptickd/config/app.toml
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.uptickd/config/app.toml
 
-# set custom ports
-sed -i.bak -e "s%^proxy_app = \"tcp://0.0.0.0:26658\"%proxy_app = \"tcp://0.0.0.0:${UPTICK_PORT}658\"%; s%^laddr = \"tcp://0.0.0.0:26657\"%laddr = \"tcp://0.0.0.0:${UPTICK_PORT}657\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:${UPTICK_PORT}060\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:${UPTICK_PORT}656\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":${UPTICK_PORT}660\"%" $HOME/.uptickd/config/config.toml
-sed -i.bak -e "s%^address = \"tcp://0.0.0.0:1317\"%address = \"tcp://0.0.0.0:${UPTICK_PORT}317\"%; s%^address = \":8080\"%address = \":${UPTICK_PORT}080\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:${UPTICK_PORT}090\"%; s%^address = \"0.0.0.0:9091\"%address = \"0.0.0.0:${UPTICK_PORT}091\"%; s%^address = \"0.0.0.0:8545\"%address = \"0.0.0.0:${UPTICK_PORT}545\"%; s%^ws-address = \"0.0.0.0:8546\"%ws-address = \"0.0.0.0:${UPTICK_PORT}546\"%" $HOME/.uptickd/config/app.toml
-
 # enable prometheus
 sed -i -e "s/prometheus = false/prometheus = true/" $HOME/.uptickd/config/config.toml
 
-uptickd tendermint unsafe-reset-all --home $HOME/.uptickd
-
 # create service
-sudo tee /etc/systemd/system/uptickd.service > /dev/null <<EOF
+sudo tee /etc/systemd/system/uptickd.service > /dev/null << EOF
 [Unit]
-Description=uptick
+Description=Uptick Network Node
 After=network-online.target
 [Service]
 User=$USER
-ExecStart=$(which uptickd) start --home $HOME/.uptickd
+ExecStart=$(which uptickd) start
 Restart=on-failure
-RestartSec=3
-LimitNOFILE=65535
+RestartSec=10
+LimitNOFILE=10000
 [Install]
 WantedBy=multi-user.target
 EOF
 
-rm -rf $HOME/.uptickd/data 
+uptickd tendermint unsafe-reset-all --home $HOME/.uptickd/ --keep-addr-book
 
 SNAP_NAME=$(curl -s https://snapshots1-testnet.nodejumper.io/uptick-testnet/ | egrep -o ">uptick_7000-2.*\.tar.lz4" | tr -d ">")
 curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/${SNAP_NAME} | lz4 -dc - | tar -xf - -C $HOME/.uptickd
@@ -143,7 +135,7 @@ curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/${SNAP_NAME} | lz4 
 # start service
 sudo systemctl daemon-reload
 sudo systemctl enable uptickd
-sudo systemctl restart uptickd
+sudo systemctl start uptickd
 
 break
 ;;
