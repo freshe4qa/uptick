@@ -70,11 +70,13 @@ source ~/.bash_profile
 fi
 
 # download binary
-curl -L -k https://github.com/UptickNetwork/uptick/releases/download/v0.2.4/uptick-linux-amd64-v0.2.4.tar.gz > uptick.tar.gz
-tar -xvzf uptick.tar.gz
-sudo mv -f uptick-linux-amd64-v0.2.4/uptickd /usr/local/bin/uptickd
-rm -rf uptick.tar.gz
-rm -rf uptick-v0.2.4
+cd $HOME
+rm -rf uptick
+git clone https://github.com/UptickNetwork/uptick.git
+cd uptick
+git checkout v0.2.5
+make build -B
+mv build/uptickd /usr/local/bin/uptickd
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
@@ -128,9 +130,8 @@ LimitNOFILE=10000
 WantedBy=multi-user.target
 EOF
 
-uptickd tendermint unsafe-reset-all --home $HOME/.uptickd/ --keep-addr-book
-
-curl https://snapshots-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-02-12.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
+uptickd tendermint unsafe-reset-all --home $HOME/.uptickd --keep-addr-book 
+curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-02-20.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
 
 # start service
 sudo systemctl daemon-reload
