@@ -74,7 +74,7 @@ cd $HOME
 rm -rf uptick
 git clone https://github.com/UptickNetwork/uptick.git
 cd uptick
-git checkout v0.2.5
+git checkout v0.2.6
 make build -B
 mv build/uptickd /usr/local/bin/uptickd
 
