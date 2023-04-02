@@ -131,7 +131,7 @@ WantedBy=multi-user.target
 EOF
 
 uptickd tendermint unsafe-reset-all --home $HOME/.uptickd --keep-addr-book 
-curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-02-20.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
+curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-04-02.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
 
 # start service
 sudo systemctl daemon-reload
