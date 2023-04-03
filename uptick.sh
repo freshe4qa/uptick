@@ -59,7 +59,7 @@ sudo apt install curl build-essential git wget jq make gcc tmux -y
 
 # install go
 if ! [ -x "$(command -v go)" ]; then
-  ver="1.18.2"
+ver="1.18.2"
 cd $HOME
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
 sudo rm -rf /usr/local/go
@@ -74,9 +74,9 @@ cd $HOME
 rm -rf uptick
 git clone https://github.com/UptickNetwork/uptick.git
 cd uptick
-git checkout v0.2.6
+ggit checkout v0.2.6
 make build -B
-mv build/uptickd /usr/local/bin/uptickd
+sudo mv build/uptickd /usr/local/bin/uptickd
 
 # config
 uptickd config chain-id $UPTICK_CHAIN_ID
@@ -86,11 +86,11 @@ uptickd config keyring-backend test
 uptickd init $NODENAME --chain-id $UPTICK_CHAIN_ID
 
 # download genesis and addrbook
-curl -o $HOME/.uptickd/config/genesis.json https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-2/genesis.json
+curl -s https://raw.githubusercontent.com/UptickNetwork/uptick-testnet/main/uptick_7000-2/genesis.json > $HOME/.uptickd/config/genesis.json
 curl -s https://snapshots1-testnet.nodejumper.io/uptick-testnet/addrbook.json > $HOME/.uptickd/config/addrbook.json
 
 # set minimum gas price
-sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0auptick\"/" $HOME/.uptickd/config/app.toml
+sed -i -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.001auptick\"/" $HOME/.uptickd/config/app.toml
 
 # set peers and seeds
 SEEDS='f97a75fb69d3a5fe893dca7c8d238ccc0bd66a8f@uptick-seed.p2p.brocha.in:30554'
@@ -131,7 +131,7 @@ WantedBy=multi-user.target
 EOF
 
 uptickd tendermint unsafe-reset-all --home $HOME/.uptickd --keep-addr-book 
-curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-04-02.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
+curl https://snapshots1-testnet.nodejumper.io/uptick-testnet/uptick_7000-2_2023-04-03.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.uptickd
 
 # start service
 sudo systemctl daemon-reload
